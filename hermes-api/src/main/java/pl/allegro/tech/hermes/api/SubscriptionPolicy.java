@@ -8,7 +8,6 @@ import javax.validation.constraints.Min;
 import java.util.Objects;
 
 public class SubscriptionPolicy {
-
     private static final Integer DEFAULT_MESSAGE_BACKOFF = 100;
 
     @Min(1)
@@ -22,16 +21,28 @@ public class SubscriptionPolicy {
 
     private boolean retryClientErrors = false;
 
+    private DeliveryType deliveryType;
+
+    // TODO: think later whether to introduce SubscriptionBatchPolicy
+    private Integer batchSize;
+    private Integer batchTime;
+
     private SubscriptionPolicy() { }
 
     @JsonCreator
     public SubscriptionPolicy(@JsonProperty("rate") int rate, @JsonProperty("messageTtl") int messageTtl,
                               @JsonProperty("retryClientErrors") boolean retryClientErrors,
-                              @JsonProperty("messageBackoff") Integer messageBackoff) {
+                              @JsonProperty("messageBackoff") Integer messageBackoff,
+                              @JsonProperty("deliveryType") DeliveryType deliveryType,
+                              @JsonProperty("batchSize") Integer batchSize,
+                              @JsonProperty("batchTime") Integer batchTime) {
         this.rate = rate;
         this.messageTtl = messageTtl;
         this.retryClientErrors = retryClientErrors;
         this.messageBackoff = messageBackoff != null ? messageBackoff : DEFAULT_MESSAGE_BACKOFF;
+        this.deliveryType = deliveryType != null ? deliveryType : DeliveryType.SERIAL;
+        this.batchSize = batchSize;
+        this.batchTime = batchTime;
     }
 
     @Override
@@ -86,6 +97,19 @@ public class SubscriptionPolicy {
     }
     //</editor-fold>
 
+
+    public DeliveryType getDeliveryType() {
+        return deliveryType;
+    }
+
+    public Integer getBatchSize() {
+        return batchSize;
+    }
+
+    public Integer getBatchTime() {
+        return batchTime;
+    }
+
     public static class Builder {
         private static final Integer DEFAULT_RATE = 400;
         private static final Integer DEFAULT_MESSAGE_TTL = 3600;
@@ -100,6 +124,7 @@ public class SubscriptionPolicy {
             subscriptionPolicy.rate = DEFAULT_RATE;
             subscriptionPolicy.messageTtl = DEFAULT_MESSAGE_TTL;
             subscriptionPolicy.messageBackoff = DEFAULT_MESSAGE_BACKOFF;
+            subscriptionPolicy.deliveryType = DeliveryType.SERIAL;
             return this;
         }
 
@@ -120,6 +145,21 @@ public class SubscriptionPolicy {
 
         public Builder withClientErrorRetry() {
             subscriptionPolicy.retryClientErrors = true;
+            return this;
+        }
+
+        public Builder withDeliveryType(DeliveryType type) {
+            subscriptionPolicy.deliveryType = type;
+            return this;
+        }
+
+        public Builder withBatchSize(int size) {
+            subscriptionPolicy.batchSize = size;
+            return this;
+        }
+
+        public Builder withBatchTime(int time) {
+            subscriptionPolicy.batchTime = time;
             return this;
         }
 

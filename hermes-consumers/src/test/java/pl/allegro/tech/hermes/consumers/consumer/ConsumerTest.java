@@ -9,6 +9,7 @@ import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
 import pl.allegro.tech.hermes.api.ContentType;
+import pl.allegro.tech.hermes.api.DeliveryType;
 import pl.allegro.tech.hermes.api.EndpointAddress;
 import pl.allegro.tech.hermes.api.Subscription;
 import pl.allegro.tech.hermes.api.SubscriptionPolicy;
@@ -171,7 +172,7 @@ public class ConsumerTest {
     public void shouldUpdateSubscriptionPolicy() {
         // given
         Subscription newSubscription = createSubscription();
-        SubscriptionPolicy newSubscriptionPolicy = new SubscriptionPolicy(2, 500, false, 10);
+        SubscriptionPolicy newSubscriptionPolicy = new SubscriptionPolicy(2, 500, false, 10, DeliveryType.SERIAL, 1, 1);
         newSubscription.setSubscriptionPolicy(newSubscriptionPolicy);
 
         // when
