@@ -1,10 +1,13 @@
 package pl.allegro.tech.hermes.consumers.supervisor;
 
+import pl.allegro.tech.hermes.api.DeliveryType;
 import pl.allegro.tech.hermes.api.Subscription;
 import pl.allegro.tech.hermes.api.Topic;
 import pl.allegro.tech.hermes.common.config.ConfigFactory;
 import pl.allegro.tech.hermes.common.metric.HermesMetrics;
+import pl.allegro.tech.hermes.consumers.consumer.BatchConsumer;
 import pl.allegro.tech.hermes.consumers.consumer.Consumer;
+import pl.allegro.tech.hermes.consumers.consumer.SerialConsumer;
 import pl.allegro.tech.hermes.consumers.consumer.ConsumerMessageSenderFactory;
 import pl.allegro.tech.hermes.consumers.consumer.converter.MessageConverterResolver;
 import pl.allegro.tech.hermes.consumers.consumer.offset.SubscriptionOffsetCommitQueues;
@@ -69,17 +72,23 @@ public class ConsumerFactory {
 
         Topic topic = topicRepository.getTopicDetails(subscription.getTopicName());
 
-        return new Consumer(
-            messageReceiverFactory.createMessageReceiver(topic, subscription),
-            hermesMetrics,
-            subscription,
-            consumerRateLimiter,
-            subscriptionOffsetCommitQueues,
-            consumerMessageSenderFactory.create(subscription, consumerRateLimiter, subscriptionOffsetCommitQueues, inflightSemaphore),
-            inflightSemaphore,
-            trackers,
-            messageConverterResolver,
-            topic);
+        if (DeliveryType.BATCH == subscription.getSubscriptionPolicy().getDeliveryType()) {
+            return new BatchConsumer(subscription, topic, hermesMetrics);
+        } else {
+            return new SerialConsumer(
+                    messageReceiverFactory.createMessageReceiver(topic, subscription),
+                    hermesMetrics,
+                    subscription,
+                    consumerRateLimiter,
+                    subscriptionOffsetCommitQueues,
+                    consumerMessageSenderFactory.create(subscription, consumerRateLimiter, subscriptionOffsetCommitQueues, inflightSemaphore),
+                    inflightSemaphore,
+                    trackers,
+                    messageConverterResolver,
+                    topic);
+        }
+
+
     }
 
 }

@@ -8,7 +8,6 @@ import org.mockito.Answers;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.runners.MockitoJUnitRunner;
-import pl.allegro.tech.hermes.api.ContentType;
 import pl.allegro.tech.hermes.api.DeliveryType;
 import pl.allegro.tech.hermes.api.EndpointAddress;
 import pl.allegro.tech.hermes.api.Subscription;
@@ -106,7 +105,7 @@ public class ConsumerTest {
         when(messageConverterResolver.converterFor(any(Message.class), any(Subscription.class)))
                 .thenReturn(new NoOperationMessageConverter());
 
-        consumer = spy(new Consumer(messageReceiver, hermesMetrics, SUBSCRIPTION,
+        consumer = spy(new SerialConsumer(messageReceiver, hermesMetrics, SUBSCRIPTION,
                 consumerRateLimiter, partitionOffsetHelper, sender, infligtSemaphore, trackers, messageConverterResolver, TOPIC));
     }
 

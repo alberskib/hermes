@@ -1,10 +1,6 @@
 package pl.allegro.tech.hermes.integration;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.tomakehurst.wiremock.verification.LoggedRequest;
-import org.assertj.core.api.Condition;
-import org.assertj.core.api.StrictAssertions;
-import org.testng.annotations.BeforeClass;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 import pl.allegro.tech.hermes.api.ContentType;
@@ -14,7 +10,6 @@ import pl.allegro.tech.hermes.api.Subscription;
 import pl.allegro.tech.hermes.api.SubscriptionPolicy;
 import pl.allegro.tech.hermes.api.Topic;
 import pl.allegro.tech.hermes.integration.env.SharedServices;
-import pl.allegro.tech.hermes.integration.helper.Assertions;
 import pl.allegro.tech.hermes.test.helper.endpoint.RemoteServiceEndpoint;
 import pl.allegro.tech.hermes.test.helper.message.TestMessage;
 
@@ -63,9 +58,9 @@ public class BatchDeliveryTest extends IntegrationTest {
         operations.createSubscription(topic, subscription);
 
         TestMessage[] testMessages = TestMessage.simpleMessages(policy.getBatchSize());
-        remoteService.expectMessages(testMessages);
 
         // when
+        remoteService.expectMessages(testMessages);
         Arrays.stream(testMessages).forEach( m ->
             assertThat(publisher.publish(topic.getQualifiedName(), m.body())).hasStatus(CREATED)
         );
@@ -79,5 +74,7 @@ public class BatchDeliveryTest extends IntegrationTest {
             }
         });
     }
+
+
 
 }

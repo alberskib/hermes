@@ -15,7 +15,7 @@ import pl.allegro.tech.hermes.common.kafka.offset.PartitionOffset;
 import pl.allegro.tech.hermes.common.kafka.offset.PartitionOffsets;
 import pl.allegro.tech.hermes.common.kafka.offset.SubscriptionOffsetChangeIndicator;
 import pl.allegro.tech.hermes.common.metric.HermesMetrics;
-import pl.allegro.tech.hermes.consumers.consumer.Consumer;
+import pl.allegro.tech.hermes.consumers.consumer.SerialConsumer;
 import pl.allegro.tech.hermes.consumers.consumer.offset.OffsetsStorage;
 import pl.allegro.tech.hermes.consumers.consumer.receiver.MessageCommitter;
 import pl.allegro.tech.hermes.consumers.message.undelivered.UndeliveredMessageLogPersister;
@@ -60,7 +60,7 @@ public class ConsumersSupervisorTest {
     private ConsumersExecutorService executorService;
 
     @Mock
-    private Consumer consumer;
+    private SerialConsumer consumer;
 
     @Mock
     private ConsumerFactory consumerFactory;
@@ -101,14 +101,14 @@ public class ConsumersSupervisorTest {
     public void shouldRunConsumerWhenPendingSubscriptionCreated() {
         consumersSupervisor.assignConsumerForSubscription(createSubscription(SOME_TOPIC_NAME, "sub1", PENDING));
 
-        verify(executorService).execute(any(Consumer.class));
+        verify(executorService).execute(any(SerialConsumer.class));
     }
 
     @Test
     public void shouldRunConsumerWhenActiveSubscriptionCreated() {
         consumersSupervisor.assignConsumerForSubscription(createSubscription(SOME_TOPIC_NAME, "sub1", ACTIVE));
 
-        verify(executorService).execute(any(Consumer.class));
+        verify(executorService).execute(any(SerialConsumer.class));
     }
 
     @Test
@@ -125,7 +125,7 @@ public class ConsumersSupervisorTest {
     public void shouldNotRunConsumerWhenSuspendedSubscriptionCreated() {
         consumersSupervisor.assignConsumerForSubscription(createSubscription(SOME_TOPIC_NAME, "sub1", SUSPENDED));
 
-        verify(executorService, never()).execute(any(Consumer.class));
+        verify(executorService, never()).execute(any(SerialConsumer.class));
     }
 
     @Test
@@ -195,9 +195,9 @@ public class ConsumersSupervisorTest {
 
     @Test
     public void shouldStopRegisteredConsumers() throws Exception {
-        Consumer firstConsumer = mock(Consumer.class);
+        SerialConsumer firstConsumer = mock(SerialConsumer.class);
         Subscription firstSubscription = createSubscription(SOME_TOPIC_NAME, "sub1");
-        Consumer secondConsumer = mock(Consumer.class);
+        SerialConsumer secondConsumer = mock(SerialConsumer.class);
         Subscription secondSubscription = createSubscription(SOME_TOPIC_NAME, "sub2");
         when(consumerFactory.createConsumer(firstSubscription)).thenReturn(firstConsumer);
         when(consumerFactory.createConsumer(secondSubscription)).thenReturn(secondConsumer);
@@ -220,7 +220,7 @@ public class ConsumersSupervisorTest {
 
         consumersSupervisor.assignConsumerForSubscription(SOME_SUBSCRIPTION);
 
-        verify(executorService, never()).execute(any(Consumer.class));
+        verify(executorService, never()).execute(any(SerialConsumer.class));
     }
 
     @Test
