@@ -18,4 +18,12 @@ public interface Consumer extends Runnable {
     List<PartitionOffset> getOffsetsToCommit();
 
     boolean isConsuming();
+
+    default void setThreadName() {
+        Thread.currentThread().setName("Consumer-" + getSubscription().getId());
+    }
+
+    default void unsetThreadName() {
+        Thread.currentThread().setName("Released thread");
+    }
 }

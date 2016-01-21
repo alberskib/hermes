@@ -118,14 +118,6 @@ public class SerialConsumer implements Consumer {
         this.subscription = newSubscription;
     }
 
-    private void setThreadName() {
-        Thread.currentThread().setName("Consumer-" + subscription.getId());
-    }
-
-    private void unsetThreadName() {
-        Thread.currentThread().setName("Released thread");
-    }
-
     public boolean isConsuming() {
         return consuming;
     }
